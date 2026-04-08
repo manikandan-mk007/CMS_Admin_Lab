@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { AuthContext } from "./AuthContext";
+import API from "../api/axios";   // ✅ import your axios instance
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(
@@ -8,7 +9,8 @@ export const AuthProvider = ({ children }) => {
 
   const login = (data) => {
     sessionStorage.setItem("access", data.tokens.access);
-    sessionStorage.setItem("refresh", data.tokens.refresh);
+    // ✅ Removed: sessionStorage.setItem("refresh", data.tokens.refresh);
+    // Refresh token is now in HttpOnly cookie set by server automatically
     sessionStorage.setItem("user", JSON.stringify(data.user));
 
     setUser(data.user);
@@ -24,9 +26,17 @@ export const AuthProvider = ({ children }) => {
     return roleRoutes[data.user.role] || "/";
   };
 
-  const logout = () => {
-    sessionStorage.clear();
-    setUser(null);
+  const logout = async () => {
+    try {
+      // ✅ Tell server to blacklist refresh token and clear cookie
+      await API.post("auth/logout/");
+    } catch (err) {
+      console.error("Logout error:", err);
+    } finally {
+      // ✅ Always clear local storage and user state
+      sessionStorage.clear();
+      setUser(null);
+    }
   };
 
   return (

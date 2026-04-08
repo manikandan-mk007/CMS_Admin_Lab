@@ -5,6 +5,7 @@ const API = axios.create({
   headers: {
     "Content-Type": "application/json",
   },
+  withCredentials: true,
 });
 
 API.interceptors.request.use(
@@ -13,6 +14,7 @@ API.interceptors.request.use(
     const url = config.url || "";
 
     if (token && !url.includes("auth/login")) {
+      config.headers = config.headers || {};
       config.headers.Authorization = `Bearer ${token}`;
     }
 
@@ -34,8 +36,9 @@ API.interceptors.response.use(
     }
 
     const isUnauthorized = error.response.status === 401;
-    const isLoginRequest = originalRequest?.url?.includes("auth/login");
-    const isRefreshRequest = originalRequest?.url?.includes("auth/token/refresh");
+    const requestUrl = originalRequest?.url || "";
+    const isLoginRequest = requestUrl.includes("auth/login");
+    const isRefreshRequest = requestUrl.includes("auth/token/refresh");
 
     if (
       isUnauthorized &&
@@ -46,23 +49,7 @@ API.interceptors.response.use(
       originalRequest._retry = true;
 
       try {
-        const refresh = sessionStorage.getItem("refresh");
-
-        if (!refresh) {
-          sessionStorage.clear();
-          window.location.href = "/login";
-          return Promise.reject(error);
-        }
-
-        const res = await axios.post(
-          "http://127.0.0.1:8000/api/auth/token/refresh/",
-          { refresh },
-          {
-            headers: {
-              "Content-Type": "application/json",
-            },
-          }
-        );
+        const res = await API.post("auth/token/refresh/", {});
 
         const newAccess = res.data?.access;
 
@@ -77,7 +64,7 @@ API.interceptors.response.use(
 
         return API(originalRequest);
       } catch (refreshError) {
-        sessionStorage.clear();
+        sessionStorage.removeItem("access");
         window.location.href = "/login";
         return Promise.reject(refreshError);
       }

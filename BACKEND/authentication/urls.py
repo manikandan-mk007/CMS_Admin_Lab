@@ -1,8 +1,5 @@
 from django.urls import path
-from rest_framework_simplejwt.views import TokenRefreshView
-
-from .views import login_view
-
+from .views import login_view, logout_view, refresh_token_view  # ✅ import new views
 
 app_name = "accounts"
 
@@ -13,8 +10,13 @@ urlpatterns = [
         name="login",
     ),
     path(
+        "logout/",
+        logout_view,                    # ✅ added
+        name="logout",
+    ),
+    path(
         "token/refresh/",
-        TokenRefreshView.as_view(),
+        refresh_token_view,             # ✅ replaced TokenRefreshView with custom one
         name="token_refresh",
     ),
 ]
