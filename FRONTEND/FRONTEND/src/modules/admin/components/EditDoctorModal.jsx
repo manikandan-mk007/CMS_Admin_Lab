@@ -110,9 +110,7 @@ export default function EditDoctorModal({
               >
                 <option value="">Select specialization</option>
                 {specializations.map((s) => (
-                  <option key={s.id} value={s.id}>
-                    {s.name}
-                  </option>
+                  <option key={s.value} value={s.value}>{s.label}</option>
                 ))}
               </select>
               {errors.specialization ? <p className="mt-2 text-xs text-red-500">{errors.specialization}</p> : null}

@@ -4,10 +4,9 @@ from django.db import transaction
 
 from .models import (
     Staff,
-    Specialization,
     Doctor,
     DoctorSchedule,
-    HospitalSettings
+    HospitalSettings,
 )
 
 
@@ -51,21 +50,6 @@ class StaffAdmin(SafeAdmin):
     ordering = ("-created_on",)
 
     readonly_fields = ("created_on",)
-
-    def has_delete_permission(self, request, obj=None):
-        # Prevent accidental hard deletes
-        return False
-
-
-# ================================
-# SPECIALIZATION ADMIN
-# ================================
-
-@admin.register(Specialization)
-class SpecializationAdmin(SafeAdmin):
-    list_display = ("id", "name")
-    search_fields = ("name",)
-    ordering = ("name",)
 
     def has_delete_permission(self, request, obj=None):
         return False
@@ -134,7 +118,6 @@ class HospitalSettingsAdmin(SafeAdmin):
     readonly_fields = ("updated_at",)
 
     def has_add_permission(self, request):
-        # Only allow one instance
         if HospitalSettings.objects.exists():
             return False
         return super().has_add_permission(request)

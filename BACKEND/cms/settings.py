@@ -139,27 +139,10 @@ WSGI_APPLICATION = "cms.wsgi.application"
 # DATABASE
 # =====================================================
 
-DB_NAME = get_env("DB_NAME", required=True)
-DB_USER = get_env("DB_USER", required=True)
-DB_PASSWORD = get_env("DB_PASSWORD", required=True)
-DB_HOST = get_env("DB_HOST", default="localhost")
-DB_PORT = get_env("DB_PORT", default="3306")
-
-if not str(DB_PORT).isdigit():
-    raise ImproperlyConfigured("DB_PORT must be a valid numeric port.")
-
 DATABASES = {
     "default": {
-        "ENGINE": "django.db.backends.mysql",
-        "NAME": DB_NAME,
-        "USER": DB_USER,
-        "PASSWORD": DB_PASSWORD,
-        "HOST": DB_HOST,
-        "PORT": DB_PORT,
-        "CONN_MAX_AGE": 60,
-        "OPTIONS": {
-            "charset": "utf8mb4",
-        },
+        "ENGINE": "django.db.backends.sqlite3",
+        "NAME": BASE_DIR / "db.sqlite3",
     }
 }
 

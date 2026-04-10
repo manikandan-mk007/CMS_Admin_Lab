@@ -10,10 +10,10 @@ from rest_framework import serializers
 
 from .models import (
     Staff,
-    Specialization,
     Doctor,
     DoctorSchedule,
     HospitalSettings,
+    SpecializationChoices,
 )
 
 from lab_tech.models import LabTest
@@ -21,7 +21,6 @@ from lab_tech.models import LabTest
 
 NAME_REGEX = re.compile(r"^[A-Za-z][A-Za-z\s.'-]*[A-Za-z]$")
 USERNAME_REGEX = re.compile(r"^[A-Za-z0-9._@+-]+$")
-SPECIALIZATION_REGEX = re.compile(r"^[A-Za-z][A-Za-z\s&()./-]*[A-Za-z)]$")
 QUALIFICATION_REGEX = re.compile(r"^[A-Za-z0-9.,()\-\/\s]+$")
 TEST_NAME_REGEX = re.compile(r"^[A-Za-z0-9][A-Za-z0-9\s().,+/%-]*[A-Za-z0-9)]$")
 
@@ -540,43 +539,19 @@ class StaffSerializer(serializers.ModelSerializer):
         return instance
 
 
-class SpecializationSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Specialization
-        fields = ["id", "name"]
+# =====================================================
+# SPECIALIZATION CHOICES SERIALIZER
+# Returns the hardcoded list for the frontend dropdown.
+# No model, no DB table — just the choices from the model.
+# =====================================================
 
-    def _get_current_specialization_id(self):
-        if self.instance:
-            return self.instance.pk
-
-        specialization_instance = self.context.get("specialization_instance")
-        if specialization_instance:
-            return specialization_instance.pk
-
-        return self.context.get("specialization_id")
-
-    def validate_name(self, value):
-        value = normalize_text(value) or ""
-
-        if not value:
-            raise serializers.ValidationError("Specialization name is required.")
-        if len(value) < 2:
-            raise serializers.ValidationError("Specialization name must be at least 2 characters long.")
-        if len(value) > 100:
-            raise serializers.ValidationError("Specialization name must not exceed 100 characters.")
-        if not SPECIALIZATION_REGEX.fullmatch(value):
-            raise serializers.ValidationError("Specialization name contains invalid characters.")
-        if is_gibberish_text(value):
-            raise serializers.ValidationError("Enter a valid specialization name.")
-
-        qs = Specialization.objects.filter(name__iexact=value)
-        current_specialization_id = self._get_current_specialization_id()
-        if current_specialization_id:
-            qs = qs.exclude(pk=current_specialization_id)
-        if qs.exists():
-            raise serializers.ValidationError("This specialization already exists.")
-
-        return value
+class SpecializationChoiceSerializer(serializers.Serializer):
+    """
+    Read-only serializer that exposes SpecializationChoices
+    as {value, label} pairs for the frontend dropdown.
+    """
+    value = serializers.CharField()
+    label = serializers.CharField()
 
 
 class DoctorSerializer(serializers.ModelSerializer):
@@ -630,9 +605,10 @@ class DoctorSerializer(serializers.ModelSerializer):
         return value
 
     def validate_specialization(self, value):
+        valid_specializations = {choice[0] for choice in SpecializationChoices.choices}
         if not value:
             raise serializers.ValidationError("Specialization is required.")
-        if not value.name or len(value.name.strip()) < 2:
+        if value not in valid_specializations:
             raise serializers.ValidationError("Invalid specialization selected.")
         return value
 

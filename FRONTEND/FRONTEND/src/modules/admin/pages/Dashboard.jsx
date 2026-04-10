@@ -32,12 +32,6 @@ const Dashboard = () => {
       path: "/admin/schedules",
     },
     {
-      title: "Specializations",
-      subtitle: "Medical specialization master data",
-      icon: <FaStethoscope size={26} />,
-      path: "/admin/specializations",
-    },
-    {
       title: "Settings",
       subtitle: "Hospital registration fee",
       icon: <FaHospital size={26} />,

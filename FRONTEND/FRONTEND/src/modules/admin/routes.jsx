@@ -2,7 +2,6 @@ import { Routes, Route, Navigate } from "react-router-dom";
 import Dashboard from "./pages/Dashboard";
 import StaffPage from "./pages/StaffPage";
 import DoctorPage from "./pages/DoctorPage";
-import SpecializationPage from "./pages/SpecializationPage";
 import AdminLayout from "./components/AdminLayout";
 import HospitalSettings from "./pages/HospitalSettings";
 import DoctorSchedule from "./pages/DoctorSchedule";
@@ -19,10 +18,6 @@ const AdminRoutes = () => {
         <Route index element={<SafeRoute><Dashboard /></SafeRoute>} />
         <Route path="staff" element={<SafeRoute><StaffPage /></SafeRoute>} />
         <Route path="doctors" element={<SafeRoute><DoctorPage /></SafeRoute>} />
-        <Route
-          path="specializations"
-          element={<SafeRoute><SpecializationPage /></SafeRoute>}
-        />
         <Route
           path="settings"
           element={<SafeRoute><HospitalSettings /></SafeRoute>}

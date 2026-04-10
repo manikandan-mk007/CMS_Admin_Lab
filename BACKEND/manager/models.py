@@ -11,7 +11,6 @@ from django.utils import timezone
 
 NAME_REGEX = re.compile(r"^[A-Za-z][A-Za-z\s.'-]*[A-Za-z]$")
 USERNAME_REGEX = re.compile(r"^[A-Za-z0-9._@+-]+$")
-SPECIALIZATION_REGEX = re.compile(r"^[A-Za-z][A-Za-z\s&()./-]*[A-Za-z)]$")
 QUALIFICATION_REGEX = re.compile(r"^[A-Za-z0-9.,()\-\/\s]+$")
 TEST_NAME_REGEX = re.compile(r"^[A-Za-z0-9][A-Za-z0-9\s().,+/%-]*[A-Za-z0-9)]$")
 
@@ -94,6 +93,36 @@ class GenderChoices(models.TextChoices):
     MALE = "M", "Male"
     FEMALE = "F", "Female"
     OTHER = "O", "Other"
+
+
+# =====================================================
+# SPECIALIZATION CHOICES
+# Hardcoded list — prevents free-text typos like
+# "Cardiology" vs "cardiologi". Add new entries here
+# when needed; they auto-appear in the frontend dropdown.
+# =====================================================
+
+class SpecializationChoices(models.TextChoices):
+    CARDIOLOGY        = "Cardiology",        "Cardiology"
+    DERMATOLOGY       = "Dermatology",       "Dermatology"
+    NEUROLOGY         = "Neurology",         "Neurology"
+    ORTHOPEDICS       = "Orthopedics",       "Orthopedics"
+    PEDIATRICS        = "Pediatrics",        "Pediatrics"
+    PSYCHIATRY        = "Psychiatry",        "Psychiatry"
+    RADIOLOGY         = "Radiology",         "Radiology"
+    GENERAL_MEDICINE  = "General Medicine",  "General Medicine"
+    ENT               = "ENT",               "ENT"
+    OPHTHALMOLOGY     = "Ophthalmology",     "Ophthalmology"
+    GYNECOLOGY        = "Gynecology",        "Gynecology"
+    UROLOGY           = "Urology",           "Urology"
+    ONCOLOGY          = "Oncology",          "Oncology"
+    ANESTHESIOLOGY    = "Anesthesiology",    "Anesthesiology"
+    NEPHROLOGY        = "Nephrology",        "Nephrology"
+    PULMONOLOGY       = "Pulmonology",       "Pulmonology"
+    GASTROENTEROLOGY  = "Gastroenterology",  "Gastroenterology"
+    ENDOCRINOLOGY     = "Endocrinology",     "Endocrinology"
+    RHEUMATOLOGY      = "Rheumatology",      "Rheumatology"
+    GENERAL_SURGERY   = "General Surgery",   "General Surgery"
 
 
 class Staff(models.Model):
@@ -307,48 +336,12 @@ class Staff(models.Model):
         return self.user.username
 
 
-class Specialization(models.Model):
-    name = models.CharField(max_length=100, unique=True)
-
-    class Meta:
-        db_table = "specialization"
-
-    def clean(self):
-        errors = {}
-
-        self.name = normalize_text(self.name) or ""
-
-        if not self.name:
-            errors["name"] = "Specialization name is required."
-        elif len(self.name) < 2:
-            errors["name"] = "Specialization name must be at least 2 characters long."
-        elif len(self.name) > 100:
-            errors["name"] = "Specialization name must not exceed 100 characters."
-        elif not SPECIALIZATION_REGEX.fullmatch(self.name):
-            errors["name"] = "Specialization name contains invalid characters."
-        elif is_gibberish_text(self.name):
-            errors["name"] = "Enter a valid specialization name."
-        else:
-            qs = Specialization.objects.filter(name__iexact=self.name)
-            if self.pk:
-                qs = qs.exclude(pk=self.pk)
-            if qs.exists():
-                errors["name"] = "This specialization already exists."
-
-        if errors:
-            raise ValidationError(errors)
-
-    def save(self, *args, **kwargs):
-        self.full_clean()
-        return super().save(*args, **kwargs)
-
-    def __str__(self):
-        return self.name
-
-
 class Doctor(models.Model):
     staff = models.OneToOneField(Staff, on_delete=models.CASCADE)
-    specialization = models.ForeignKey(Specialization, on_delete=models.PROTECT)
+    specialization = models.CharField(
+        max_length=100,
+        choices=SpecializationChoices.choices,
+    )
     consultation_fee = models.DecimalField(max_digits=10, decimal_places=2)
 
     available_from = models.TimeField()
@@ -380,12 +373,11 @@ class Doctor(models.Model):
             if existing_qs.exists():
                 errors["staff"] = "This staff is already assigned as a doctor."
 
-        if not self.specialization_id:
+        valid_specializations = {choice[0] for choice in SpecializationChoices.choices}
+        if not self.specialization:
             errors["specialization"] = "Specialization is required."
-        else:
-            spec_name = normalize_text(getattr(self.specialization, "name", ""))
-            if not spec_name:
-                errors["specialization"] = "Invalid specialization selected."
+        elif self.specialization not in valid_specializations:
+            errors["specialization"] = "Invalid specialization selected."
 
         if self.consultation_fee in (None, ""):
             errors["consultation_fee"] = "Consultation fee is required."
@@ -472,7 +464,7 @@ class Doctor(models.Model):
         return self.staff.user.get_full_name()
 
     def __str__(self):
-        return f"{self.staff.user.username} - {self.specialization.name}"
+        return f"{self.staff.user.username} - {self.specialization}"
 
 
 class DoctorSchedule(models.Model):

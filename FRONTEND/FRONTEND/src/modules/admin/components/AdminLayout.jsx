@@ -9,7 +9,6 @@ const navItems = [
   { label: "Staff", path: "/admin/staff" },
   { label: "Doctors", path: "/admin/doctors" },
   { label: "Schedules", path: "/admin/schedules" },
-  { label: "Specializations", path: "/admin/specializations" },
   { label: "Settings", path: "/admin/settings" },
   { label: "Lab Tests", path: "/admin/lab-tests" },
 ];

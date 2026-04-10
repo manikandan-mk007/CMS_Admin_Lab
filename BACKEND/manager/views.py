@@ -14,18 +14,18 @@ from rest_framework.exceptions import ValidationError as DRFValidationError
 from .services import get_doctor_availability
 from .models import (
     Staff,
-    Specialization,
     Doctor,
     DoctorSchedule,
-    HospitalSettings
+    HospitalSettings,
+    SpecializationChoices,
 )
 from .serializers import (
     StaffSerializer,
-    SpecializationSerializer,
+    SpecializationChoiceSerializer,
     DoctorSerializer,
     DoctorScheduleSerializer,
     HospitalSettingsSerializer,
-    LabTestSerializer
+    LabTestSerializer,
 )
 
 from lab_tech.models import LabTest
@@ -170,18 +170,28 @@ class StaffViewSet(viewsets.ModelViewSet):
 
 
 # =====================================================
-# SPECIALIZATION VIEWSET
+# SPECIALIZATION CHOICES VIEW
+# Replaces the old SpecializationViewSet.
+# Returns a hardcoded list — no DB reads, no writes.
+# The frontend calls GET /manager/specializations/ and
+# gets [{value, label}, ...] to populate the dropdown.
 # =====================================================
 
-class SpecializationViewSet(viewsets.ModelViewSet):
+class SpecializationListView(APIView):
     """
-    Admin → Full access
-    Receptionist → Read only
+    GET /manager/specializations/
+    Returns the hardcoded specialization choices.
+    Admin and Receptionist can read. No create/update/delete.
     """
-
-    queryset = Specialization.objects.all()
-    serializer_class = SpecializationSerializer
     permission_classes = [IsAuthenticated, IsAdminOrReceptionistReadOnly]
+
+    def get(self, request):
+        data = [
+            {"value": value, "label": label}
+            for value, label in SpecializationChoices.choices
+        ]
+        serializer = SpecializationChoiceSerializer(data, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
 
 # =====================================================
@@ -197,7 +207,6 @@ class DoctorViewSet(viewsets.ModelViewSet):
     queryset = Doctor.objects.select_related(
         "staff",
         "staff__user",
-        "specialization"
     )
     serializer_class = DoctorSerializer
     permission_classes = [IsAuthenticated, IsAdminOrReceptionistReadOnly]

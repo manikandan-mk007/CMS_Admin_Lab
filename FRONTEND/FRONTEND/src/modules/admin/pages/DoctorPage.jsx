@@ -56,7 +56,7 @@ export default function DoctorPage() {
 
   const specMap = {};
   specializations.forEach((s) => {
-    specMap[s.id] = s.name;
+  specMap[s.value] = s.label;
   });
 
   const staffMap = {};
