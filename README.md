@@ -47,33 +47,33 @@ This application simulates a real-world hospital workflow with role-based access
 
 ###  Dashboards
 ![Admin Dashboard](admindashboard.png)
-![Main Dashboard](images/maindashboard.png)
-![Lab Dashboard](images/labdashboard.png)
+![Main Dashboard](maindashboard.png)
+![Lab Dashboard](labdashboard.png)
 
 
 
 ###  Doctor & Staff
-![Doctor](images/doctor.png)
-![Staff](images/staff.png)
+![Doctor](doctor.png)
+![Staff](staff.png)
 
 
 
 ###  Lab Module
-![Lab Prescription](images/labprescription.png)
-![Lab Report](images/labreport.png)
-![Lab Test](images/labtest.png)
-![Lab Test Admin](images/labtestadmin.png)
+![Lab Prescription](labprescription.png)
+![Lab Report](labreport.png)
+![Lab Test](labtest.png)
+![Lab Test Admin](labtestadmin.png)
 
 
 
 ###  Billing & Schedule
-![Billing](images/labbilling.png)
-![Schedule](images/schedule.png)
+![Billing](labbilling.png)
+![Schedule](schedule.png)
 
 
 
 ###  Authentication
-![Sign In](images/signinpage.png)
+![Sign In](signinpage.png)
 
 
 
