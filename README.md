@@ -46,9 +46,7 @@ This application simulates a real-world hospital workflow with role-based access
 ##  Screenshots
 
 ###  Dashboards
-![Admin Dashboard](admindashboard.png)
-![Main Dashboard](maindashboard.png)
-![Lab Dashboard](labdashboard.png)
+| ![](admindashboard.png) | ![](maindashboard.png) | ![](labdashboard.png) |
 
 
 
