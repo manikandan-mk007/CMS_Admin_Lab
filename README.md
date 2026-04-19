@@ -42,36 +42,40 @@ This application simulates a real-world hospital workflow with role-based access
  https://cmsadminlab.vercel.app/
 
 
-
 ##  Screenshots
 
 ###  Dashboards
+| Admin Dashboard | Main Dashboard | Lab Dashboard |
+|-----------------|----------------|---------------|
 | ![](admindashboard.png) | ![](maindashboard.png) | ![](labdashboard.png) |
 
-
+---
 
 ###  Doctor & Staff
-![Doctor](doctor.png)
-![Staff](staff.png)
+| Doctor | Staff |
+|--------|-------|
+| ![](doctor.png) | ![](staff.png) |
 
-
+---
 
 ###  Lab Module
-![Lab Prescription](labprescription.png)
-![Lab Report](labreport.png)
-![Lab Test](labtest.png)
-![Lab Test Admin](labtestadmin.png)
+| Prescription | Report | Test | Test Admin |
+|-------------|--------|------|------------|
+| ![](labprescription.png) | ![](labreport.png) | ![](labtest.png) | ![](labtestadmin.png) |
 
-
+---
 
 ###  Billing & Schedule
-![Billing](labbilling.png)
-![Schedule](schedule.png)
+| Billing | Schedule |
+|--------|----------|
+| ![](labbilling.png) | ![](schedule.png) |
 
-
+---
 
 ###  Authentication
-![Sign In](signinpage.png)
+| Sign In |
+|--------|
+| ![](signinpage.png) |
 
 
 
